@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sort-images"
+version = "0.1.0"
+description = "Sort photos into YYYY-MM folders using the capture date read from EXIF metadata."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Ratnajit Mukherjee" }]
+dependencies = [
+    "ExifRead>=3.0",
+    "pillow>=10.0",
+    "pillow-heif>=0.13",
+    "tqdm>=4.66",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-cov>=5.0",
+]
+
+[project.scripts]
+sort-images = "sort_images.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["sort_images*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.coverage.run]
+source = ["sort_images"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
