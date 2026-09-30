@@ -1,8 +1,6 @@
 Pillow
+pillow-heif
 tqdm
-
-# Optional, only needed if your phone saved .heic photos
-# pillow-heif
 
 # For running the tests
 pytest

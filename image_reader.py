@@ -1,17 +1,12 @@
 """Reading images: is it an image, is it corrupted, and when was it taken."""
 
-import os
 from datetime import datetime
 
+import pillow_heif
 from PIL import Image
 
-# Optional: lets Pillow open HEIC photos (some Samsung phones save these).
-# Install with `pip install pillow-heif` if your DCIM folder has .heic files.
-try:
-    import pillow_heif
-    pillow_heif.register_heif_opener()
-except ImportError:
-    pass
+# Teach Pillow to open HEIC / HEIF photos.
+pillow_heif.register_heif_opener()
 
 
 class ImageReader:

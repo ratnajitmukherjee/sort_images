@@ -25,6 +25,9 @@ python main.py -i /media/drive/DCIM -o /media/drive/Sorted --mode move
 | `-o, --output-dir` | Where the `YYYY-MM` folders go. Created if missing.       |
 | `-m, --mode`       | `copy` (default) or `move`.                               |
 
+Supported images: `.jpg`, `.jpeg`, `.png`, `.webp`, `.heic`, `.heif`
+(HEIC/HEIF via `pillow-heif`). Videos and other files are ignored.
+
 Images that are corrupted or have no EXIF date are left where they are and
 listed in the report. The report is printed at the end and saved as
 `report_<timestamp>.txt` in the output folder.

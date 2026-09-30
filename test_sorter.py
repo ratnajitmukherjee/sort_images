@@ -12,7 +12,8 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 
 
 def make_image(path, date=None):
-    """Create a small JPEG at `path`, with an EXIF DateTimeOriginal if `date` is given."""
+    """Create a small image at `path` (format from the extension), with an EXIF
+    DateTimeOriginal if `date` is given."""
     os.makedirs(os.path.dirname(path), exist_ok=True)
     exif = Image.Exif()
     if date:
@@ -39,6 +40,19 @@ def test_copies_into_year_month_folders(tmp_path):
     assert os.path.isfile(os.path.join(output_dir, "2023-05", "a.jpg"))
     assert os.path.isfile(os.path.join(output_dir, "2024-12", "b.jpg"))
     assert os.path.isfile(os.path.join(input_dir, "a.jpg"))  # copy keeps the original
+
+
+def test_heic_and_heif_images_are_sorted(tmp_path):
+    input_dir = str(tmp_path / "in")
+    output_dir = str(tmp_path / "out")
+    make_image(os.path.join(input_dir, "photo.heic"), "2022:08:03 09:15:00")
+    make_image(os.path.join(input_dir, "photo2.HEIF"), "2022:09:10 18:00:00")
+
+    sorter = run_sorter(input_dir, output_dir)
+
+    assert sorter.dead_letter_queue == []
+    assert os.path.isfile(os.path.join(output_dir, "2022-08", "photo.heic"))
+    assert os.path.isfile(os.path.join(output_dir, "2022-09", "photo2.HEIF"))
 
 
 def test_move_removes_original(tmp_path):
