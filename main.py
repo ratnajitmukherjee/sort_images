@@ -1,31 +1,44 @@
 #!/usr/bin/env python3
-"""Entry point for sort-images. Run or debug this file directly.
+"""Sort photos into YYYY-MM folders using the date stored in their EXIF data.
 
-    python main.py -i ~/Pictures/holiday --dry-run
-    python main.py -i ~/Pictures/holiday -o ~/Pictures/sorted
-
-In PyCharm: right-click this file -> Run / Debug, then set the arguments under
-Run > Edit Configurations. Breakpoints anywhere in ``sort_images/`` will hit.
-
-The real work lives in ``sort_images/``; this file only wires it up:
-
-    cli.py         argument parsing, orchestration   <- start here
-    discovery.py   which files are candidates
-    exif_reader.py pulling the timestamp out of a file
-    date_source.py deciding which date to trust
-    planner.py     working out destinations (no writes)
-    executor.py    actually moving files
+Usage:
+    python main.py -i /media/drive/DCIM
+    python main.py -i /media/drive/DCIM -o /media/drive/Sorted --mode move
 """
 
-from __future__ import annotations
-
+import argparse
+import os
 import sys
-from pathlib import Path
 
-# Allow running this file straight from a checkout, without `pip install -e .`
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+from executor import ImageSorter
 
-from sort_images.cli import main  # noqa: E402
+
+def main():
+    parser = argparse.ArgumentParser(description="Sort images into YYYY-MM folders by EXIF date.")
+    parser.add_argument("-i", "--input-dir", required=True,
+                        help="Folder containing the images (sub-folders are included).")
+    parser.add_argument("-o", "--output-dir",
+                        help="Where the YYYY-MM folders go. Default: <input-dir>/sorted_images")
+    parser.add_argument("-m", "--mode", choices=["copy", "move"], default="copy",
+                        help="Copy the images (safe, default) or move them.")
+    args = parser.parse_args()
+
+    input_dir = os.path.abspath(args.input_dir)
+    if not os.path.isdir(input_dir):
+        print(f"Error: input directory does not exist: {input_dir}", file=sys.stderr)
+        sys.exit(1)
+
+    if args.output_dir:
+        output_dir = os.path.abspath(args.output_dir)
+    else:
+        output_dir = os.path.join(input_dir, "sorted_images")
+
+    if not os.path.isdir(output_dir):
+        os.makedirs(output_dir)
+
+    sorter = ImageSorter(input_dir, output_dir, args.mode)
+    sorter.run()
+
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    main()
